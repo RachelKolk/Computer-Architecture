@@ -59,15 +59,36 @@ unsigned char cpu_ram_write(struct cpu *cpu, unsigned char value, int index)
 void cpu_run(struct cpu *cpu)
 {
   int running = 1; // True until we get a HLT instruction
+  // ir is the Instruction register (or the currently running instruction)
+  unsigned char ir;
+  // first operand declaration
+  unsigned char register_a;
+  // second operand declaration
+  unsigned char register_b;
+  // operand count declaration
+  int operand_count;
 
   while (running) {
     // TODO
     // 1. Get the value of the current instruction (in address PC).
+    ir = cpu_ram_read(cpu, cpu->pc);
     // 2. Figure out how many operands this next instruction requires
+    operand_count = ir >> DATA_LEN;
     // 3. Get the appropriate value(s) of the operands following this instruction
+    register_a = cpu_ram_read(cpu, cpu->pc + 1);
+    register_b = cpu_ram_read(cpu, cpu->pc + 2);
     // 4. switch() over it to decide on a course of action.
+    switch (ir) 
+    {
     // 5. Do whatever the instruction should do according to the spec.
+      default:
+        printf("Unrecognized instruction\n");
+        exit(1);
+        break;
+    }
+    
     // 6. Move the PC to the next instruction.
+    cpu->pc += operand_count + 1;
   }
 }
 
@@ -77,6 +98,6 @@ void cpu_run(struct cpu *cpu)
 void cpu_init(struct cpu *cpu)
 {
   // TODO: Initialize the PC and other special registers
-  // set program counter (index of current instrcution) to 0
+  // set program counter (index of current instruction) to 0
   cpu->pc = 0;
 }

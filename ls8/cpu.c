@@ -40,6 +40,19 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
   }
 }
 
+// RAM Read Function
+unsigned char cpu_ram_read(struct cpu *cpu, int index) 
+{
+  return cpu->ram[index];
+}
+
+// RAM Write Function
+unsigned char cpu_ram_write(struct cpu *cpu, unsigned char value, int index)
+ {
+   return cpu->ram[index] = value;
+ }
+
+
 /**
  * Run the CPU
  */
@@ -64,4 +77,6 @@ void cpu_run(struct cpu *cpu)
 void cpu_init(struct cpu *cpu)
 {
   // TODO: Initialize the PC and other special registers
+  // set program counter (index of current instrcution) to 0
+  cpu->pc = 0;
 }

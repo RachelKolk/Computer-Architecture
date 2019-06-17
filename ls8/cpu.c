@@ -1,4 +1,6 @@
 #include "cpu.h"
+#include "stdlib.h"
+#include "stdio.h"
 
 #define DATA_LEN 6
 
@@ -67,13 +69,14 @@ void cpu_run(struct cpu *cpu)
   unsigned char register_b;
   // operand count declaration
   int operand_count;
+  int reg_index;
 
   while (running) {
     // TODO
     // 1. Get the value of the current instruction (in address PC).
     ir = cpu_ram_read(cpu, cpu->pc);
     // 2. Figure out how many operands this next instruction requires
-    operand_count = ir >> DATA_LEN;
+    operand_count = ir >> 6;
     // 3. Get the appropriate value(s) of the operands following this instruction
     register_a = cpu_ram_read(cpu, cpu->pc + 1);
     register_b = cpu_ram_read(cpu, cpu->pc + 2);
@@ -81,6 +84,28 @@ void cpu_run(struct cpu *cpu)
     switch (ir) 
     {
     // 5. Do whatever the instruction should do according to the spec.
+
+      case LDI:
+        // set register at first operand to the value of the second operand
+        reg_index = register_a & 0b00000111;
+        cpu->registers[reg_index] = register_b;
+        // advance the operand counter
+        cpu->pc += operand_count;
+        break;
+
+      case PRN:
+        // access register at first operand register
+        reg_index = register_a & 0b00000111;
+        // then print the value
+        printf("%d\n", cpu->registers[reg_index]);
+        // advance the operand counter
+        cpu->pc += operand_count;
+        break;
+
+      case HLT:
+        running = 0;
+        break;
+
       default:
         printf("Unrecognized instruction\n");
         exit(1);

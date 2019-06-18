@@ -79,6 +79,28 @@ unsigned char cpu_ram_write(struct cpu *cpu, unsigned char value, int index)
    return cpu->ram[index] = value;
  }
 
+/**
+ * Handler Functions
+ */
+void ldi_handler(struct cpu *cpu, unsigned char operand_a, unsigned char operand_b)
+{
+  printf("Executing LDI\n");
+  // set register at first operand to the value of the second operand
+  int reg_index = operand_a & 0b00000111;
+  cpu->registers[reg_index] = operand_b;  
+}
+
+void prn_handler(struct cpu *cpu, unsigned char operand_a)
+{
+  printf("Executing PRN\n");
+  // access register at first operand register
+  int reg_index = operand_a & 0b00000111;
+  // then print the value
+  printf("%d\n", cpu->registers[reg_index]);   
+}
+   
+
+
 
 /**
  * Run the CPU
@@ -95,7 +117,7 @@ void cpu_run(struct cpu *cpu)
   unsigned char operand_b;
   // operand count declaration
   int operand_count;
-  int reg_index;
+  
 
   while (running) {
     // TODO
@@ -112,22 +134,14 @@ void cpu_run(struct cpu *cpu)
     // 5. Do whatever the instruction should do according to the spec.
 
       case LDI:
-        printf("Executing LDI\n");
-        // set register at first operand to the value of the second operand
-        reg_index = operand_a & 0b00000111;
-        cpu->registers[reg_index] = operand_b;        
+        ldi_handler(cpu, operand_a, operand_b);        
         break;
 
       case PRN:
-      printf("Executing PRN\n");
-        // access register at first operand register
-        reg_index = operand_a & 0b00000111;
-        // then print the value
-        printf("%d\n", cpu->registers[reg_index]);
+        prn_handler(cpu, operand_a);
         break;
 
       case MUL:
-        // use the ALU_MUL function
         alu(cpu, ALU_MUL, operand_a, operand_b);
         break;
 

@@ -61,12 +61,13 @@ unsigned char cpu_ram_write(struct cpu *cpu, unsigned char value, int index)
 void cpu_run(struct cpu *cpu)
 {
   int running = 1; // True until we get a HLT instruction
+  
   // ir is the Instruction register (or the currently running instruction)
   unsigned char ir;
   // first operand declaration
-  unsigned char register_a;
+  unsigned char operand_a;
   // second operand declaration
-  unsigned char register_b;
+  unsigned char operand_b;
   // operand count declaration
   int operand_count;
   int reg_index;
@@ -78,31 +79,31 @@ void cpu_run(struct cpu *cpu)
     // 2. Figure out how many operands this next instruction requires
     operand_count = ir >> 6;
     // 3. Get the appropriate value(s) of the operands following this instruction
-    register_a = cpu_ram_read(cpu, cpu->pc + 1);
-    register_b = cpu_ram_read(cpu, cpu->pc + 2);
+    operand_a = cpu_ram_read(cpu, cpu->pc + 1);
+    operand_b = cpu_ram_read(cpu, cpu->pc + 2);
     // 4. switch() over it to decide on a course of action.
     switch (ir) 
     {
     // 5. Do whatever the instruction should do according to the spec.
 
       case LDI:
+        printf("Executing LDI\n");
+        //printf("register a = %c\n", operand_a);
         // set register at first operand to the value of the second operand
-        reg_index = register_a & 0b00000111;
-        cpu->registers[reg_index] = register_b;
-        // advance the operand counter
-        cpu->pc += operand_count;
+        reg_index = operand_a & 0b00000111;
+        cpu->registers[reg_index] = operand_b;        
         break;
 
       case PRN:
+      printf("Executing PRN\n");
         // access register at first operand register
-        reg_index = register_a & 0b00000111;
+        reg_index = operand_a & 0b00000111;
         // then print the value
         printf("%d\n", cpu->registers[reg_index]);
-        // advance the operand counter
-        cpu->pc += operand_count;
         break;
 
       case HLT:
+        printf("Executing HLT\n");
         running = 0;
         break;
 

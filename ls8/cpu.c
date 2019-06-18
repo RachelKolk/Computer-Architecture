@@ -1,6 +1,7 @@
 #include "cpu.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #define DATA_LEN 6
 
@@ -44,9 +45,22 @@ void cpu_load(struct cpu *cpu, char *filename)
  */
 void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB)
 {
+  int reg_index;
+  unsigned char value;
+
   switch (op) {
     case ALU_MUL:
-      // TODO
+      printf("Executing MUL\n");
+      // find index of register b
+      reg_index = regB & 0b00000111;
+      // set it to a temp var value
+      value = cpu->registers[reg_index];
+      // then find the index of register a
+      reg_index = regA & 0b00000111;
+      // update the value temp var to (value * value at register a)
+      value = value * cpu->registers[reg_index];
+      // store the resulting product in register a
+      cpu->registers[reg_index] = value;      
       break;
 
     // TODO: implement more ALU ops
@@ -99,7 +113,6 @@ void cpu_run(struct cpu *cpu)
 
       case LDI:
         printf("Executing LDI\n");
-        //printf("register a = %c\n", operand_a);
         // set register at first operand to the value of the second operand
         reg_index = operand_a & 0b00000111;
         cpu->registers[reg_index] = operand_b;        
@@ -111,6 +124,11 @@ void cpu_run(struct cpu *cpu)
         reg_index = operand_a & 0b00000111;
         // then print the value
         printf("%d\n", cpu->registers[reg_index]);
+        break;
+
+      case MUL:
+        // use the ALU_MUL function
+        alu(cpu, ALU_MUL, operand_a, operand_b);
         break;
 
       case HLT:
@@ -137,4 +155,7 @@ void cpu_init(struct cpu *cpu)
   // TODO: Initialize the PC and other special registers
   // set program counter (index of current instruction) to 0
   cpu->pc = 0;
+  // set all register and ram bytes to 0 bits using memset
+  memset(cpu->registers, 0, sizeof(cpu->registers));
+  memset(cpu->ram, 0, sizeof(cpu->ram));
 }

@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
   // checks for exactly 2 arguments
   if (argc != 2)
   {
-    printf(stderr, "usage: fileio filename\n");
-    exit(1);
+    fprintf(stderr, "usage: comp filename\n");
+    return 1;
   }
 
   cpu_init(&cpu);

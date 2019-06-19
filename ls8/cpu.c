@@ -4,6 +4,7 @@
 #include <string.h>
 
 #define DATA_LEN 6
+#define SP 7
 
 /**
  * Load the binary bytes from a .ls8 source file into a RAM array
@@ -80,7 +81,7 @@ unsigned char cpu_ram_write(struct cpu *cpu, unsigned char value, int index)
  }
 
 /**
- * Handler Functions
+ * Handler Functions for Instructions
  */
 void ldi_handler(struct cpu *cpu, unsigned char operand_a, unsigned char operand_b)
 {
@@ -97,6 +98,17 @@ void prn_handler(struct cpu *cpu, unsigned char operand_a)
   int reg_index = operand_a & 0b00000111;
   // then print the value
   printf("%d\n", cpu->registers[reg_index]);   
+}
+
+void push_handler (struct cpu *cpu, unsigned char operand_a)
+{
+  printf("Executing PUSH\n");
+  // decrement the stack pointer
+  cpu->registers[SP]--;
+  // get the value from the register index of operand_a
+  int value = cpu->registers[operand_a];
+  // push the value onto the stack using the write function
+  cpu_ram_write(cpu, value, cpu->registers[SP]);
 }
    
 
@@ -143,6 +155,10 @@ void cpu_run(struct cpu *cpu)
 
       case MUL:
         alu(cpu, ALU_MUL, operand_a, operand_b);
+        break;
+
+      case PUSH:
+        push_handler(cpu, operand_a);
         break;
 
       case HLT:

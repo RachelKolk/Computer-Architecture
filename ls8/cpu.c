@@ -65,6 +65,15 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
       break;
 
     // TODO: implement more ALU ops
+    case ALU_ADD:
+      printf("Executing ADD\n");
+      // set value of operand_b to temp var
+      value = cpu->registers[regB];
+      // add the value of operand_a to the var
+      value = value + cpu->registers[regA];
+      // store the result in register a
+      cpu->registers[regA] = value;
+      break;
   }
 }
 
@@ -174,6 +183,10 @@ void cpu_run(struct cpu *cpu)
 
       case POP:
         pop_handler(cpu, operand_a);
+        break;
+
+      case ADD:
+        alu(cpu, ALU_ADD, operand_a, operand_b);
         break;
 
       case HLT:

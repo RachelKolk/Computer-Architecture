@@ -110,6 +110,17 @@ void push_handler (struct cpu *cpu, unsigned char operand_a)
   // push the value onto the stack using the write function
   cpu_ram_write(cpu, value, cpu->registers[SP]);
 }
+
+void pop_handler (struct cpu *cpu, unsigned char operand_a)
+{
+  printf("Executing POP\n");
+  // read the stack pointer registers
+  int value = cpu_ram_read(cpu, cpu->registers[SP]);
+  // store the value from the register index of operand_a
+  cpu->registers[operand_a] = value;
+  //increment the stack pointer
+  cpu->registers[SP]++; 
+}
    
 
 
@@ -159,6 +170,10 @@ void cpu_run(struct cpu *cpu)
 
       case PUSH:
         push_handler(cpu, operand_a);
+        break;
+
+      case POP:
+        pop_handler(cpu, operand_a);
         break;
 
       case HLT:

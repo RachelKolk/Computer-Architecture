@@ -131,7 +131,15 @@ void pop_handler (struct cpu *cpu, unsigned char operand_a)
   cpu->registers[SP]++; 
 }
    
-
+void call_handler (struct cpu *cpu, unsigned char operand_a)
+{
+  // decrement the stack pointer
+  cpu->registers[SP]--;
+  // save the instruction after CALL to the stack using the write function
+  cpu_ram_write(cpu, cpu->pc + 2, cpu->registers[SP]);
+  // set the pc to the value of register index operand_a
+  cpu->pc = cpu->registers[operand_a];
+}
 
 
 /**
@@ -189,6 +197,10 @@ void cpu_run(struct cpu *cpu)
         alu(cpu, ALU_ADD, operand_a, operand_b);
         break;
 
+      case CALL:
+        call_handler(cpu, operand_a);
+        break;
+
       case HLT:
         printf("Executing HLT\n");
         running = 0;
@@ -216,4 +228,6 @@ void cpu_init(struct cpu *cpu)
   // set all register and ram bytes to 0 bits using memset
   memset(cpu->registers, 0, sizeof(cpu->registers));
   memset(cpu->ram, 0, sizeof(cpu->ram));
+  // set the stack pointer to F4
+  cpu->registers[SP] = 244;
 }

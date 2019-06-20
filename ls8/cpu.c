@@ -133,6 +133,7 @@ void pop_handler (struct cpu *cpu, unsigned char operand_a)
    
 void call_handler (struct cpu *cpu, unsigned char operand_a)
 {
+  printf("Executing CALL\n");
   // decrement the stack pointer
   cpu->registers[SP]--;
   // save the instruction after CALL to the stack using the write function
@@ -141,6 +142,14 @@ void call_handler (struct cpu *cpu, unsigned char operand_a)
   cpu->pc = cpu->registers[operand_a];
 }
 
+void ret_handler (struct cpu *cpu)
+{
+  printf("Executing RET\n");
+  // pop the value form the top of the stack and store it in the pc
+  cpu->pc = cpu_ram_read(cpu, cpu->registers[SP]);
+  // increment the stack pointer
+  cpu->registers[SP]++;
+}
 
 /**
  * Run the CPU
@@ -201,6 +210,10 @@ void cpu_run(struct cpu *cpu)
         call_handler(cpu, operand_a);
         break;
 
+      case RET:
+        ret_handler(cpu);
+        break;
+
       case HLT:
         printf("Executing HLT\n");
         running = 0;
@@ -212,8 +225,12 @@ void cpu_run(struct cpu *cpu)
         break;
     }
     
-    // 6. Move the PC to the next instruction.
-    cpu->pc += operand_count + 1;
+    // check to see if ir sets the pc directly &
+    // 6. Move the PC to the next instruction depending
+    if (!(ir & SETS_PC))
+    {
+      cpu->pc += operand_count + 1;
+    }
   }
 }
 

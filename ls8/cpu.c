@@ -51,7 +51,7 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
 
   switch (op) {
     case ALU_MUL:
-      printf("Executing MUL\n");
+      //printf("Executing MUL\n");
       // find index of register b
       reg_index = regB & 0b00000111;
       // set it to a temp var value
@@ -66,7 +66,7 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
 
     // TODO: implement more ALU ops
     case ALU_ADD:
-      printf("Executing ADD\n");
+      //printf("Executing ADD\n");
       // set value of operand_b to temp var
       value = cpu->registers[regB];
       // add the value of operand_a to the var
@@ -77,7 +77,7 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
 
     case ALU_CMP:
       //`FL` bits: `00000LGE`
-      printf("Executing CMP\n");
+      //printf("Executing CMP\n");
       // compare the values in two registers
       if (cpu->registers[regA] == cpu->registers[regB])
       {
@@ -113,7 +113,7 @@ unsigned char cpu_ram_write(struct cpu *cpu, unsigned char value, int index)
  */
 void ldi_handler(struct cpu *cpu, unsigned char operand_a, unsigned char operand_b)
 {
-  printf("Executing LDI\n");
+  //printf("Executing LDI\n");
   // set register at first operand to the value of the second operand
   int reg_index = operand_a & 0b00000111;
   cpu->registers[reg_index] = operand_b;  
@@ -121,7 +121,7 @@ void ldi_handler(struct cpu *cpu, unsigned char operand_a, unsigned char operand
 
 void prn_handler(struct cpu *cpu, unsigned char operand_a)
 {
-  printf("Executing PRN\n");
+  //printf("Executing PRN\n");
   // access register at first operand register
   int reg_index = operand_a & 0b00000111;
   // then print the value
@@ -130,7 +130,7 @@ void prn_handler(struct cpu *cpu, unsigned char operand_a)
 
 void push_handler (struct cpu *cpu, unsigned char operand_a)
 {
-  printf("Executing PUSH\n");
+  //printf("Executing PUSH\n");
   // decrement the stack pointer
   cpu->registers[SP]--;
   // get the value from the register index of operand_a
@@ -141,7 +141,7 @@ void push_handler (struct cpu *cpu, unsigned char operand_a)
 
 void pop_handler (struct cpu *cpu, unsigned char operand_a)
 {
-  printf("Executing POP\n");
+  //printf("Executing POP\n");
   // read the stack pointer registers
   int value = cpu_ram_read(cpu, cpu->registers[SP]);
   // store the value from the register index of operand_a
@@ -152,7 +152,7 @@ void pop_handler (struct cpu *cpu, unsigned char operand_a)
    
 void call_handler (struct cpu *cpu, unsigned char operand_a)
 {
-  printf("Executing CALL\n");
+  //printf("Executing CALL\n");
   // decrement the stack pointer
   cpu->registers[SP]--;
   // save the instruction after CALL to the stack using the write function
@@ -163,7 +163,7 @@ void call_handler (struct cpu *cpu, unsigned char operand_a)
 
 void ret_handler (struct cpu *cpu)
 {
-  printf("Executing RET\n");
+  //printf("Executing RET\n");
   // pop the value form the top of the stack and store it in the pc
   cpu->pc = cpu_ram_read(cpu, cpu->registers[SP]);
   // increment the stack pointer
@@ -172,14 +172,14 @@ void ret_handler (struct cpu *cpu)
 
 void jmp_handler (struct cpu *cpu, unsigned char operand_a)
 {
-  printf("Executing JMP\n");
+  //printf("Executing JMP\n");
   // jump to the address stored in the given register by setting the pc value
   cpu->pc = cpu->registers[operand_a];
 }
 
 void jeq_handler (struct cpu *cpu, unsigned char operand_a, int operand_count)
 {
-  printf("Executing JEQ\n");
+  //printf("Executing JEQ\n");
   // check to see if the equal flag is true (1)
   if (cpu->flag & 0b00000001)
   {
@@ -194,6 +194,7 @@ void jeq_handler (struct cpu *cpu, unsigned char operand_a, int operand_count)
 
 void jne_handler (struct cpu *cpu, unsigned char operand_a, int operand_count)
 {
+  //printf("Executing JNE\n");
   // if the equal flag is false (0)
   if (!(cpu->flag & 0b00000001))
   {
@@ -278,14 +279,18 @@ void cpu_run(struct cpu *cpu)
 
       case JEQ:
         jeq_handler(cpu, operand_a, operand_count);
+        // reset flag to 0
+        cpu->flag = 0;
         break;
 
       case JNE:
         jne_handler(cpu, operand_a, operand_count);
+        // reset flag to 0
+        cpu->flag = 0;
         break;
 
       case HLT:
-        printf("Executing HLT\n");
+        //printf("Executing HLT\n");
         running = 0;
         break;
 

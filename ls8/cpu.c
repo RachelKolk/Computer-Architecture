@@ -170,6 +170,12 @@ void ret_handler (struct cpu *cpu)
   cpu->registers[SP]++;
 }
 
+void jmp_handler (struct cpu *cpu, unsigned char operand_a)
+{
+  // jump to the address stored in the given register by setting the pc value
+  cpu->pc = cpu->registers[operand_a];
+}
+
 
 /**
  * Run the CPU
@@ -187,7 +193,6 @@ void cpu_run(struct cpu *cpu)
   // operand count declaration
   int operand_count;
   
-
   while (running) {
     // TODO
     // 1. Get the value of the current instruction (in address PC).
@@ -201,7 +206,6 @@ void cpu_run(struct cpu *cpu)
     switch (ir) 
     {
     // 5. Do whatever the instruction should do according to the spec.
-
       case LDI:
         ldi_handler(cpu, operand_a, operand_b);        
         break;
@@ -236,6 +240,10 @@ void cpu_run(struct cpu *cpu)
 
       case CMP:
         alu(cpu, ALU_CMP, operand_a, operand_b);
+        break;
+
+      case JMP:
+        jmp_handler(cpu, operand_a);
         break;
 
       case HLT:

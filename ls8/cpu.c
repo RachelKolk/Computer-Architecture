@@ -192,6 +192,20 @@ void jeq_handler (struct cpu *cpu, unsigned char operand_a, int operand_count)
   }
 }
 
+void jne_handler (struct cpu *cpu, unsigned char operand_a, int operand_count)
+{
+  // if the equal flag is false (0)
+  if (!(cpu->flag & 0b00000001))
+  {
+    // jump to the address stored at the given register by setting the pc value
+    cpu->pc = cpu->registers[operand_a];
+  } else
+  {
+    // manually set the pc value
+    cpu->pc += operand_count + 1;
+  }
+}
+
 
 /**
  * Run the CPU
@@ -264,6 +278,10 @@ void cpu_run(struct cpu *cpu)
 
       case JEQ:
         jeq_handler(cpu, operand_a, operand_count);
+        break;
+
+      case JNE:
+        jne_handler(cpu, operand_a, operand_count);
         break;
 
       case HLT:

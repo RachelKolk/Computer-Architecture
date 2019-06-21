@@ -74,6 +74,25 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
       // store the result in register a
       cpu->registers[regA] = value;
       break;
+
+    case ALU_CMP:
+      //`FL` bits: `00000LGE`
+      printf("Executing CMP\n");
+      // compare the values in two registers
+      if (cpu->registers[regA] == cpu->registers[regB])
+      {
+        // set equal flag to 1
+        cpu->flag ^= 0b00000001;
+      } else if (cpu->registers[regA] > cpu->registers[regB])
+      {
+        // set greater than flag to 1
+        cpu->flag ^= 0b00000010;
+      } else 
+      {
+        // set less than flag to 1
+        cpu->flag ^= 0b00000100;
+      }
+      break;
   }
 }
 
@@ -151,6 +170,7 @@ void ret_handler (struct cpu *cpu)
   cpu->registers[SP]++;
 }
 
+
 /**
  * Run the CPU
  */
@@ -214,6 +234,10 @@ void cpu_run(struct cpu *cpu)
         ret_handler(cpu);
         break;
 
+      case CMP:
+        alu(cpu, ALU_CMP, operand_a, operand_b);
+        break;
+
       case HLT:
         printf("Executing HLT\n");
         running = 0;
@@ -247,4 +271,6 @@ void cpu_init(struct cpu *cpu)
   memset(cpu->ram, 0, sizeof(cpu->ram));
   // set the stack pointer to F4
   cpu->registers[SP] = 244;
+  // set flag to 0
+  cpu->flag = 0;
 }

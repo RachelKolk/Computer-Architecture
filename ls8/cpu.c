@@ -172,8 +172,24 @@ void ret_handler (struct cpu *cpu)
 
 void jmp_handler (struct cpu *cpu, unsigned char operand_a)
 {
+  printf("Executing JMP\n");
   // jump to the address stored in the given register by setting the pc value
   cpu->pc = cpu->registers[operand_a];
+}
+
+void jeq_handler (struct cpu *cpu, unsigned char operand_a, int operand_count)
+{
+  printf("Executing JEQ\n");
+  // check to see if the equal flag is true (1)
+  if (cpu->flag & 0b00000001)
+  {
+    // if so, jump to the address stored at the given register by setting the pc value
+    cpu->pc = cpu->registers[operand_a];
+  } else
+  {
+    // manually set the pc value
+    cpu->pc += operand_count + 1;
+  }
 }
 
 
@@ -244,6 +260,10 @@ void cpu_run(struct cpu *cpu)
 
       case JMP:
         jmp_handler(cpu, operand_a);
+        break;
+
+      case JEQ:
+        jeq_handler(cpu, operand_a, operand_count);
         break;
 
       case HLT:
